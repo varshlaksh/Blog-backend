@@ -1,30 +1,35 @@
 const express = require("express");
 const router = express.Router();
-const Post = require("../models/Post"); // Make sure this path is correct
+const Post = require("../models/Post");
+const verifyToken = require("../middleware/verifyToken"); // ✅ Import it here
 
-// 🔹 Create a new blog post
-router.post("/", async (req, res) => {
-  const newPost = new Post(req.body);
+// ✅ Protected Route: Create Post
+router.post("/", verifyToken, async (req, res) => {
+  const newPost = new Post({
+    ...req.body,
+    userId: req.user.id, // Save the user who created the post
+  });
+
   try {
     const savedPost = await newPost.save();
-    res.status(201).json(savedPost);
+    res.status(200).json(savedPost);
   } catch (err) {
-    res.status(500).json({ error: "Failed to create post", details: err });
+    res.status(500).json(err);
   }
 });
 
-// 🔹 Get all blog posts
+// ✅ Public Route: Get all posts
 router.get("/", async (req, res) => {
   try {
     const posts = await Post.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch posts", details: err });
+    res.status(500).json(err);
   }
 });
 
-// 🔹 Update a blog post by ID
-router.put("/:id", async (req, res) => {
+// ✅ Protected Route: Update Post
+router.put("/:id", verifyToken, async (req, res) => {
   try {
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
@@ -33,17 +38,17 @@ router.put("/:id", async (req, res) => {
     );
     res.status(200).json(updatedPost);
   } catch (err) {
-    res.status(500).json({ error: "Failed to update post", details: err });
+    res.status(500).json(err);
   }
 });
 
-// 🔹 Delete a blog post by ID
-router.delete("/:id", async (req, res) => {
+// ✅ Protected Route: Delete Post
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
     await Post.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Post deleted successfully" });
+    res.status(200).json("Post deleted");
   } catch (err) {
-    res.status(500).json({ error: "Failed to delete post", details: err });
+    res.status(500).json(err);
   }
 });
 

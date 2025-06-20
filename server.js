@@ -29,3 +29,7 @@ app.use("/api/posts", postRoutes);
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });
+
+
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
