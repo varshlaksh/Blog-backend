@@ -1,0 +1,9 @@
+# Don't track environment config
+.env
+
+# Don't upload installed packages
+node_modules/
+
+# OS/System junk files
+.DS_Store
+Thumbs.db
